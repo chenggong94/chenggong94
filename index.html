@@ -44,7 +44,7 @@
     flex-shrink: 0;
   }
 
-  /* 聊天区容器 —— quikchat 会自动填充它 */
+  /* 聊天区容器 */
   #chatContainer {
     flex: 1;
     width: 100%;
@@ -55,11 +55,14 @@
   /* 底部音乐播放器区域 */
   .music-bar {
     flex-shrink: 0;
-    padding: 6px 12px;
-    padding-bottom: calc(6px + env(safe-area-inset-bottom));
+    padding: 8px 12px;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
     background: #ffffff;
     border-top: 1px solid #e5e7eb;
     z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 </style>
 </head>
@@ -67,10 +70,8 @@
 
   <div class="header">和猫猫૭的聊天</div>
 
-  <!-- 聊天区域：quikchat 会接管这个容器 -->
   <div id="chatContainer"></div>
 
-  <!-- 底部音乐播放器：使用 WPWebPlayer 自定义标签 -->
   <div class="music-bar">
     <wp-music-player
       src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
@@ -89,43 +90,40 @@
 <script>
   // ========== 1. 初始化 quikchat 聊天组件 ==========
   const chat = new quikchat('#chatContainer', async (chat, userMessage) => {
-    // 用户发消息后，显示在自己的右侧
     chat.messageAddNew(userMessage, 'me', 'right', 'user');
 
-    // 模拟对方回复（延迟 800ms）
     const typingId = chat.messageAddTypingIndicator('猫猫');
     setTimeout(() => {
-      chat.messageRemove(typingId); // 移除输入指示器
+      chat.messageRemove(typingId);
       chat.messageAddNew('收到啦！(๑•̀ㅂ•́)و✧', '猫猫', 'left', 'assistant');
     }, 800);
   }, {
     theme: 'quikchat-theme-light',
     trackHistory: true,
-    titleArea: {
-      title: '和猫猫૭的聊天',
-      show: false        // 顶部已有 header，这里隐藏 title
-    },
+    titleArea: { title: '和猫猫૭的聊天', show: false },
     showTimestamps: true,
-    sanitize: true
+    sanitize: false // ⚠️ 重点：必须改成 false，否则 HTML 标签会被显示成文字！
   });
 
   // ========== 2. 预设初始聊天记录（相册网格 + 图片） ==========
-  // 注意：quikchat 默认将内容作为文本处理。
-  // 如果需要显示图片，可利用 sanitize:false 插入自定义 HTML。
-  // 下面演示插入一条带图片的消息：
+  // 注意：使用了 sanitize: false 后，图片可以直接正常渲染。
+  
+  // 单张图片消息
   chat.messageAddNew(
     '<div>猫猫，我今天又实现了规划里的小目标！</div>' +
-    '<img src="https://imagetourl.im/api/storage/file?key=anon%2F-%2F8208589618697-721e2364-a913-4f72-baa3-8a2427d59aa7-19992.jpg" style="max-width:200px;border-radius:8px;margin-top:8px;display:block;" />',
+    '<img src="https://imagetourl.im/api/storage/file?key=anon%2F-%2F8208589618697-721e2364-a913-4f72-baa3-8a2427d59aa7-19992.jpg" style="max-width:100%; border-radius:8px; margin-top:8px; display:block;" />',
     '兔兔',
     'left',
     'user'
   );
 
+  // 纯文字回复
   chat.messageAddNew('揉揉兔头', '猫猫', 'right', 'assistant');
 
+  // 相册网格（4图）
   chat.messageAddNew(
     '<div>我还拍了其他照片，你看看！</div>' +
-    '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:4px;margin-top:8px;max-width:220px;">' +
+    '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:4px;margin-top:8px;width:100%;">' +
       '<img src="https://picsum.photos/id/1016/300/300" style="width:100%;height:100px;object-fit:cover;border-radius:4px;" />' +
       '<img src="https://picsum.photos/id/1018/300/300" style="width:100%;height:100px;object-fit:cover;border-radius:4px;" />' +
       '<img src="https://picsum.photos/id/1019/300/300" style="width:100%;height:100px;object-fit:cover;border-radius:4px;" />' +
