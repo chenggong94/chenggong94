@@ -2,28 +2,40 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<!-- 关键1：添加 viewport-fit=cover，让网页延伸至全面屏底部 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>我的专属聊天</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  /* 关键2：使用 dvh 动态视口高度，代替旧的 100vh */
+  html, body {
+    height: 100%;
+  }
   body { 
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background: #f3f4f6;
-    height: 100vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    height: 100dvh; /* 移动端新标准，动态计算高度 */
+    height: 100vh;  /* 兜底，老设备不支持 dvh 时用这个 */
   }
+
   .header {
     height: 56px; background: #ffffff;
     display: flex; align-items: center; justify-content: center;
     font-weight: bold; font-size: 17px; color: #333;
     border-bottom: 1px solid #e5e7eb; z-index: 10;
+    padding-top: env(safe-area-inset-top); /* 适配刘海屏顶部 */
   }
+
   .chat-area {
     flex: 1; overflow-y: auto; padding: 16px;
     display: flex; flex-direction: column; gap: 16px;
+    padding-bottom: 20px; /* 留出点底部空间，防止内容紧贴输入框 */
   }
+
   .msg-row { display: flex; align-items: flex-start; width: 100%; }
   .msg-row.left { justify-content: flex-start; }
   .msg-row.right { justify-content: flex-end; }
@@ -40,11 +52,14 @@
   
   .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; margin-top: 8px; border-radius: 8px; overflow: hidden; max-width: 220px; }
   .gallery-grid img { width: 100%; height: 100px; object-fit: cover; cursor: pointer; }
-  .single-img { width: 100%; max-width: 200px; border-radius: 8px; margin-top: 8px; display: block; }
+  .single-img { width: 100%; max-width: 200px; border-radius: 8px; margin-top: 8px; display: block; cursor: pointer; }
 
+  /* 关键3：给底部输入框增加安全距离，防止被手机底部横条遮挡 */
   .input-area {
-    height: 60px; background: #ffffff; display: flex; align-items: center;
-    padding: 0 12px; gap: 8px; border-top: 1px solid #e5e7eb; z-index: 10;
+    background: #ffffff; display: flex; align-items: center;
+    padding: 10px 12px; 
+    padding-bottom: calc(10px + env(safe-area-inset-bottom)); /* 适配 iPhone 底部小黑条 */
+    gap: 8px; border-top: 1px solid #e5e7eb; z-index: 10;
   }
   .input-area input {
     flex: 1; height: 40px; border: 1px solid #d1d5db; border-radius: 20px;
@@ -58,6 +73,7 @@
     cursor: pointer; flex-shrink: 0; transition: 0.2s;
   }
   .input-area button:active { transform: scale(0.95); }
+  
   /* 图片预览弹窗 */
   .overlay {
     display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85);
@@ -77,8 +93,8 @@
       <div class="avatar"><img src="https://api.dicebear.com/7.x/thumbs/svg?seed=cat" alt="猫猫"></div>
       <div class="bubble">
         <div>猫猫，我今天又实现了规划里的小目标！</div>
-        <!-- 注意这里的引号已经修复，换成你自己的图片链接 -->
-        <img class="single-img" src="https://imagetourl.im/api/storage/file?key=anon%2F-%2F8208589618697-721e2364-a913-4f72-baa3-8a2427d59aa7-19992.jpg" alt="照片" />
+        <!-- 提示：记得换成你自己的图片链接哦！ -->
+        <img class="single-img" src="https://imagetourl.im/api/storage/file?key=anon%2F-%2F8208589618697-721e2364-a913-4f72-baa3-8a2427d59aa7-19992.jpg" onclick="openImg(this.src)">
       </div>
     </div>
 
@@ -101,7 +117,7 @@
     </div>
   </div>
 
-  <!-- 底部输入框（解锁版） -->
+  <!-- 底部输入区 -->
   <div class="input-area">
     <input type="file" id="fileInput" accept="image/*" style="display: none;">
     <button style="background: transparent; color: #666; font-size: 24px;" onclick="document.getElementById('fileInput').click()">+</button>
@@ -114,17 +130,15 @@
   </div>
 
 <script>
-  // 1. 获取页面元素
   const chatArea = document.getElementById('chatArea');
   const msgInput = document.getElementById('msgInput');
   const fileInput = document.getElementById('fileInput');
 
-  // 2. 发送文字消息
+  // 发送文字消息
   function sendMessage() {
     const text = msgInput.value.trim();
-    if (!text) return; // 没字就不发
+    if (!text) return;
 
-    // 生成自己的消息气泡
     const myMsgHTML = `
       <div class="msg-row right">
         <div class="bubble">${text}</div>
@@ -132,12 +146,10 @@
       </div>
     `;
     chatArea.insertAdjacentHTML('beforeend', myMsgHTML);
-    
-    // 清空输入框并滚动到底部
     msgInput.value = '';
     chatArea.scrollTop = chatArea.scrollHeight;
 
-    // 3. 模拟对方回复（延迟0.8秒）
+    // 模拟自动回复
     setTimeout(() => {
       const replyHTML = `
         <div class="msg-row left">
@@ -150,18 +162,17 @@
     }, 800);
   }
 
-  // 4. 发送图片
+  // 发送本地图片
   fileInput.addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = function(event) {
-      const imgSrc = event.target.result; // 把本地图片转换成网页能显示的代码
       const imgHTML = `
         <div class="msg-row right">
           <div class="bubble">
-            <img class="single-img" src="${imgSrc}" onclick="openImg(this.src)">
+            <img class="single-img" src="${event.target.result}" onclick="openImg(this.src)">
           </div>
           <div class="avatar"><img src="https://api.dicebear.com/7.x/thumbs/svg?seed=me" alt="兔兔"></div>
         </div>
@@ -170,16 +181,16 @@
       chatArea.scrollTop = chatArea.scrollHeight;
     };
     reader.readAsDataURL(file);
-    fileInput.value = ''; // 清空文件选择
+    fileInput.value = '';
   });
 
-  // 5. 点击图片放大预览
+  // 图片放大预览
   function openImg(src) {
     document.getElementById('overlayImg').src = src;
     document.getElementById('overlay').classList.add('active');
   }
 
-  // 6. 按回车键也能发送
+  // 回车发送
   msgInput.addEventListener('keydown', function(e) {
     if (e.key === 'Enter') sendMessage();
   });
