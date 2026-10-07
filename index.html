@@ -2,328 +2,65 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>聊天界面</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>聊天相册列表</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-    background: #f2f2f7;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    overflow: hidden;
-  }
-
-  .chat-container {
-    width: 100%;
-    max-width: 420px;
-    height: 100vh;
-    max-height: 800px;
-    background: #fff;
-    display: flex;
-    flex-direction: column;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-  }
-
-  /* 顶部标题栏 */
-  .chat-header {
-    padding: 14px 16px;
-    text-align: center;
-    font-size: 16px;
-    font-weight: 600;
-    color: #1c1c1e;
-    border-bottom: 1px solid #e5e5ea;
-    background: #fafafa;
-    flex-shrink: 0;
-  }
-
-  /* 消息滚动区域 */
-  .chat-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px;
-    background: #f2f2f7;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* 单条消息行 */
-  .msg-row {
-    display: flex;
-    margin-bottom: 16px;
-    align-items: flex-start;
-  }
-  .msg-row.left { justify-content: flex-start; }
+  body { font-family: sans-serif; background: #f0f0f0; display: flex; justify-content: center; padding: 20px; }
+  .chat-container { width: 100%; max-width: 450px; background: #fff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; }
+  .chat-header { padding: 15px; background: #4a76a8; color: white; font-weight: bold; text-align: center; }
+  .chat-body { padding: 15px; height: 500px; overflow-y: auto; background: #e5e5e5; }
+  .msg-row { display: flex; margin-bottom: 15px; }
   .msg-row.right { justify-content: flex-end; }
-
-  /* 头像 */
-  .avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 6px;
-    flex-shrink: 0;
-    overflow: hidden;
-    background: #ddd;
-  }
-  .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .msg-row.left .avatar { margin-right: 10px; }
-  .msg-row.right .avatar { margin-left: 10px; }
-
-  /* 气泡 */
-  .bubble {
-    max-width: 72%;
-    padding: 10px 14px;
-    border-radius: 12px;
-    font-size: 15px;
-    line-height: 1.5;
-    word-break: break-word;
-    position: relative;
-  }
-  .msg-row.left .bubble {
-    background: #fff;
-    color: #1c1c1e;
-    border-top-left-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-  }
-  .msg-row.right .bubble {
-    background: #4f46e5;
-    color: #fff;
-    border-top-right-radius: 4px;
-  }
-
-  /* 气泡内的图片 */
-  .bubble img.chat-img {
-    max-width: 100%;
-    border-radius: 8px;
-    margin-top: 8px;
-    display: block;
-    cursor: pointer;
-  }
-
-  /* 时间戳 */
-  .timestamp {
-    text-align: center;
-    font-size: 12px;
-    color: #8e8e93;
-    margin: 12px 0;
-  }
-
-  /* 底部输入栏 */
-  .chat-footer {
-    padding: 10px 12px;
-    background: #fafafa;
-    border-top: 1px solid #e5e5ea;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
-  }
-
-  .chat-footer input[type="text"] {
-    flex: 1;
-    padding: 10px 14px;
-    border: 1px solid #e5e5ea;
-    border-radius: 20px;
-    font-size: 15px;
-    outline: none;
-    background: #fff;
-    transition: border-color 0.2s;
-  }
-  .chat-footer input[type="text"]:focus { border-color: #4f46e5; }
-
-  .attach-btn, .send-btn {
-    width: 40px;
-    height: 40px;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    font-size: 18px;
-    transition: background 0.2s;
-  }
-  .attach-btn {
-    background: #e5e5ea;
-    color: #1c1c1e;
-  }
-  .attach-btn:hover { background: #d1d1d6; }
-  .send-btn {
-    background: #4f46e5;
-    color: #fff;
-  }
-  .send-btn:hover { background: #4338ca; }
-
-  /* 图片预览弹窗 */
-  .overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.85);
-    z-index: 999;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-  }
-  .overlay.active { display: flex; }
-  .overlay img {
-    max-width: 90%;
-    max-height: 90%;
-    border-radius: 8px;
-  }
-
-  /* 滚动条美化 */
-  .chat-body::-webkit-scrollbar { width: 4px; }
-  .chat-body::-webkit-scrollbar-thumb { background: #c7c7cc; border-radius: 4px; }
+  .bubble { max-width: 80%; padding: 10px; border-radius: 10px; background: white; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+  .msg-row.right .bubble { background: #dcf8c6; }
+  .text { font-size: 15px; margin-bottom: 8px; }
+  /* 相册网格核心样式 */
+  .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 5px; border-radius: 8px; overflow: hidden; }
+  .gallery-grid img { width: 100%; height: 100px; object-fit: cover; cursor: pointer; display: block; }
+  .gallery-grid img:hover { opacity: 0.9; }
+  /* 灯箱效果 */
+  .lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
+  .lightbox.active { display: flex; }
+  .lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; }
 </style>
 </head>
 <body>
-
 <div class="chat-container">
-
-  <div class="chat-header">🐱 猫猫聊天</div>
-
-  <div class="chat-body" id="chatBody">
-    <!-- 消息会通过 JavaScript 动态插入，这里放初始内容 -->
+  <div class="chat-header">📸 旅行相册</div>
+  <div class="chat-body">
+    <div class="msg-row right">
+      <div class="bubble">
+        <div class="text">这次去海边拍了好多照片！</div>
+        <!-- 相册网格 -->
+        <div class="gallery-grid">
+          <img src="https://picsum.photos/id/1015/400/400" onclick="openLightbox(this.src)">
+          <img src="https://picsum.photos/id/1016/400/400" onclick="openLightbox(this.src)">
+          <img src="https://picsum.photos/id/1018/400/400" onclick="openLightbox(this.src)">
+          <img src="https://picsum.photos/id/1019/400/400" onclick="openLightbox(this.src)">
+          <img src="https://picsum.photos/id/1021/400/400" onclick="openLightbox(this.src)">
+        </div>
+      </div>
+    </div>
+    <div class="msg-row">
+      <div class="bubble">
+        <div class="text">太美了！这是在哪里？</div>
+      </div>
+    </div>
   </div>
-
-  <div class="chat-footer">
-    <input type="file" id="fileInput" accept="image/*" hidden>
-    <button class="attach-btn" id="attachBtn" title="发送图片">📎</button>
-    <input type="text" id="msgInput" placeholder="输入消息...">
-    <button class="send-btn" id="sendBtn">➤</button>
-  </div>
-
 </div>
 
-<!-- 图片放大预览 -->
-<div class="overlay" id="overlay">
-  <img id="overlayImg" src="" alt="预览">
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img id="lightboxImg" src="">
 </div>
 
 <script>
-// ==================== 配置区（改这里） ====================
-const CONFIG = {
-  // 你的头像图片链接，可以换成你自己的图片
-  myAvatar: 'https://api.dicebear.com/7.x/thumbs/svg?seed=me',
-  // 对方头像图片链接
-  otherAvatar: 'https://api.dicebear.com/7.x/thumbs/svg?seed=cat',
-  // 初始消息（对方发的）
-  initialMessages: [
-    {
-      side: 'left',
-      text: '猫猫，我今天又实现了规划里的小目标！',
-      image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400'
-    },
-    {
-      side: 'right',
-      text: '太棒了！恭喜兔兔迈出人生的一大步！'
-    }
-  ]
-};
-// =======================================================
-
-const chatBody = document.getElementById('chatBody');
-const msgInput = document.getElementById('msgInput');
-const sendBtn = document.getElementById('sendBtn');
-const attachBtn = document.getElementById('attachBtn');
-const fileInput = document.getElementById('fileInput');
-const overlay = document.getElementById('overlay');
-const overlayImg = document.getElementById('overlayImg');
-
-// 渲染单条消息
-function renderMessage(side, text, image) {
-  const row = document.createElement('div');
-  row.className = 'msg-row ' + side;
-
-  const avatar = document.createElement('div');
-  avatar.className = 'avatar';
-  const avatarImg = document.createElement('img');
-  avatarImg.src = side === 'left' ? CONFIG.otherAvatar : CONFIG.myAvatar;
-  avatar.appendChild(avatarImg);
-
-  const bubble = document.createElement('div');
-  bubble.className = 'bubble';
-
-  if (text) {
-    const textNode = document.createElement('div');
-    textNode.textContent = text;
-    bubble.appendChild(textNode);
+  function openLightbox(src) {
+    document.getElementById('lightboxImg').src = src;
+    document.getElementById('lightbox').classList.add('active');
   }
-
-  if (image) {
-    const img = document.createElement('img');
-    img.className = 'chat-img';
-    img.src = image;
-    img.alt = '图片';
-    img.addEventListener('click', () => openOverlay(image));
-    bubble.appendChild(img);
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('active');
   }
-
-  if (side === 'left') {
-    row.appendChild(avatar);
-    row.appendChild(bubble);
-  } else {
-    row.appendChild(bubble);
-    row.appendChild(avatar);
-  }
-
-  chatBody.appendChild(row);
-  chatBody.scrollTop = chatBody.scrollHeight;
-}
-
-// 打开图片预览
-function openOverlay(src) {
-  overlayImg.src = src;
-  overlay.classList.add('active');
-}
-overlay.addEventListener('click', () => overlay.classList.remove('active'));
-
-// 发送文字消息
-function sendMessage() {
-  const text = msgInput.value.trim();
-  if (!text) return;
-  renderMessage('right', text);
-  msgInput.value = '';
-  // 模拟对方回复（延迟 800ms）
-  setTimeout(() => {
-    renderMessage('left', '收到啦！😊');
-  }, 800);
-}
-
-// 发送图片消息
-function sendImage(file) {
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    renderMessage('right', '', e.target.result);
-  };
-  reader.readAsDataURL(file);
-}
-
-// 事件绑定
-sendBtn.addEventListener('click', sendMessage);
-msgInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') sendMessage();
-});
-
-attachBtn.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (file) sendImage(file);
-  fileInput.value = '';
-});
-
-// 初始化渲染
-CONFIG.initialMessages.forEach(msg => {
-  renderMessage(msg.side, msg.text, msg.image);
-});
 </script>
-
 </body>
 </html>
