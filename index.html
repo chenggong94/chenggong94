@@ -94,4 +94,16 @@
 </div>
 
 </body>
-</html>
+</html><div id="lightbox" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:999; justify-content:center; align-items:center;" onclick="this.style.display='none'">
+  <img id="lightboxImg" src="" style="max-width:90%; max-height:90%; border-radius:8px;">
+</div>
+<script>
+  // 给所有图片加上点击事件
+  document.querySelectorAll('.gallery-grid img, .single-img').forEach(img => {
+    img.style.cursor = 'pointer';
+    img.onclick = function() {
+      document.getElementById('lightboxImg').src = this.src;
+      document.getElementById('lightbox').style.display = 'flex';
+    }
+  });
+</script>
