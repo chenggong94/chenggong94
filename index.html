@@ -2,119 +2,226 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>我的对话框</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>我的专属空间</title>
 <style>
-  body { background-color: #f3f4f6; font-family: sans-serif; padding: 20px; }
-  .chat-container { max-width: 500px; margin: 0 auto; }
-  
-  /* 左侧消息 */
-  .msg-left { display: flex; margin-bottom: 20px; }
-  .msg-left .avatar { width: 40px; height: 40px; border-radius: 5px; background: #ccc; margin-right: 10px; flex-shrink: 0; overflow: hidden; }
-  .msg-left .avatar img { width: 100%; height: 100%; object-fit: cover; }
-  .msg-left .bubble { background: white; padding: 12px; border-radius: 0 10px 10px 10px; max-width: 75%; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-  
-  /* 右侧消息 */
-  .msg-right { display: flex; justify-content: flex-end; margin-bottom: 20px; }
-  .msg-right .avatar { width: 40px; height: 40px; border-radius: 5px; background: #ccc; margin-left: 10px; flex-shrink: 0; overflow: hidden; }
-  .msg-right .avatar img { width: 100%; height: 100%; object-fit: cover; }
-  .msg-right .bubble { background: #4f46e5; color: white; padding: 12px; border-radius: 10px 0 10px 10px; max-width: 75%; }
-  
-  /* 气泡里的文字 */
-  .text { font-size: 15px; line-height: 1.5; margin-bottom: 8px; }
-  
-  /* 单张图片的样式 */
-  .bubble img.single-img { width: 100%; border-radius: 5px; margin-top: 5px; display: block; }
-  
-  /* 相册网格样式（2张或4张图片的排版） */
-  .gallery-grid { 
-    display: grid; 
-    grid-template-columns: repeat(2, 1fr); 
-    gap: 5px; 
-    margin-top: 8px; 
-    border-radius: 8px; 
-    overflow: hidden; 
+  /* 基础重置 */
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: #eef2f6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-tap-highlight-color: transparent;
   }
-  .gallery-grid img { 
-    width: 100%; 
-    height: 120px; 
-    object-fit: cover; 
-    cursor: pointer; 
-    display: block; 
+
+  /* 整体容器，模拟手机 App 界面 */
+  .app-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* 顶部音乐卡片 */
+  .music-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
+    border-radius: 20px;
+    padding: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .music-card h3 { margin: 0; font-size: 16px; color: #333; display: flex; align-items: center; gap: 6px; }
+  .music-card audio { width: 100%; height: 40px; outline: none; }
+
+  /* 聊天主容器 */
+  .chat-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-bottom: 40px;
+  }
+
+  /* 消息行通用布局 */
+  .msg-row { display: flex; align-items: flex-start; width: 100%; }
+  .msg-row.left { justify-content: flex-start; }
+  .msg-row.right { justify-content: flex-end; }
+
+  /* 头像 */
+  .avatar {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .msg-row.left .avatar { margin-right: 10px; }
+  .msg-row.right .avatar { margin-left: 10px; }
+
+  /* 气泡基础样式 */
+  .bubble {
+    max-width: 78%;
+    padding: 12px 16px;
+    font-size: 15px;
+    line-height: 1.6;
+    word-wrap: break-word;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+  }
+
+  /* 左侧气泡（别人发的） */
+  .msg-row.left .bubble {
+    background: #ffffff;
+    color: #333;
+    border-radius: 0px 20px 20px 20px; /* 左上角直角，其余圆角 */
+  }
+
+  /* 右侧气泡（你自己发的） */
+  .msg-row.right .bubble {
+    background: #5b6ef5; /* 温和的蓝紫色 */
+    color: #ffffff;
+    border-radius: 20px 0px 20px 20px; /* 右上角直角，其余圆角 */
+  }
+
+  /* 气泡里的图片 */
+  .bubble .single-img {
+    width: 100%;
+    max-width: 260px; /* 防止单张图过大 */
+    border-radius: 12px;
+    margin-top: 8px;
+    display: block;
+    cursor: pointer;
+  }
+
+  /* 相册网格 */
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    margin-top: 10px;
+    border-radius: 12px;
+    overflow: hidden;
+    max-width: 260px;
+  }
+  .gallery-grid img {
+    width: 100%;
+    height: 125px;
+    object-fit: cover;
+    cursor: pointer;
+    display: block;
+  }
+
+  /* 点击放大的黑色遮罩层 */
+  #lightbox {
+    display: none; 
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100%; height: 100%; 
+    background: rgba(0, 0, 0, 0.92); 
+    z-index: 9999; 
+    justify-content: center; 
+    align-items: center;
+    backdrop-filter: blur(5px);
+  }
+  #lightbox img { 
+    max-width: 95%; 
+    max-height: 95%; 
+    border-radius: 8px; 
+    object-fit: contain;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   }
 </style>
 </head>
 <body>
 
-<div class="chat-container">
-
-  <!-- ============ 第1条：左侧，带单张图片 ============ -->
-  <div class="msg-left">
-    <div class="avatar"><img src="https://api.dicebear.com/7.x/thumbs/svg?seed=cat" alt="猫猫"></div>
-    <div class="bubble">
-      <div class="text">猫猫，我今天又实现了规划里的小目标！</div>
-      <img class="single-img" src="https://picsum.photos/id/1015/400/300" alt="阅读照片">
-    </div>
+<div class="app-container">
+  
+  <!-- 🎵 音乐播放器区域 -->
+  <div class="music-card">
+    <h3>🎵 我的专属歌单</h3>
+    <audio controls>
+      <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+      你的浏览器不支持音频播放。
+    </audio>
   </div>
 
-  <!-- ============ 第2条：右侧，纯文字回复 ============ -->
-  <div class="msg-right">
-    <div class="bubble">
-      <div class="text">太棒了！恭喜兔兔迈出人生的一大步！</div>
-    </div>
-    <div class="avatar"><img src="https://api.dicebear.com/7.x/thumbs/svg?seed=me" alt="兔兔"></div>
-  </div>
-
-  <!-- ============ 第3条：左侧，像相册一样带4张图 ============ -->
-  <div class="msg-left">
-    <div class="avatar"><img src="https://api.dicebear.com/7.x/thumbs/svg?seed=cat" alt="猫猫"></div>
-    <div class="bubble">
-      <div class="text">我还拍了其他照片，你看看！</div>
-      <!-- 相册网格：2x2排列 -->
-      <div class="gallery-grid">
-        <img src="https://picsum.photos/id/1016/300/300" alt="照片1">
-        <img src="https://picsum.photos/id/1018/300/300" alt="照片2">
-        <img src="https://picsum.photos/id/1019/300/300" alt="照片3">
-        <img src="https://picsum.photos/id/1021/300/300" alt="照片4">
+  <!-- 💬 聊天对话区域 -->
+  <div class="chat-container">
+    
+    <!-- 第1条：左侧，带单张图 -->
+    <div class="msg-row left">
+      <div class="avatar"><img src="https://api.dicebear.com/7.x/thumbs/svg?seed=cat" alt="猫猫"></div>
+      <div class="bubble">
+        <div>猫猫，我今天又实现了规划里的小目标！</div>
+        <img class="single-img" src="https://picsum.photos/id/1015/400/300" alt="阅读照片">
       </div>
     </div>
-  </div>
 
-  <!-- ============ 第4条：右侧，带单张图 ============ -->
-  <div class="msg-right">
-    <div class="bubble">
-      <div class="text">哇，风景真好！这是在哪儿拍的？</div>
-      <img class="single-img" src="https://picsum.photos/id/1022/400/300" alt="风景图">
+    <!-- 第2条：右侧，纯文字 -->
+    <div class="msg-row right">
+      <div class="bubble">太棒了！恭喜兔兔迈出人生的一大步！</div>
+      <div class="avatar"><img src="https://api.dicebear.com/7.x/thumbs/svg?seed=me" alt="兔兔"></div>
     </div>
-    <div class="avatar"><img src="https://api.dicebear.com/7.x/thumbs/svg?seed=me" alt="兔兔"></div>
+
+    <!-- 第3条：左侧，相册网格 (4张图) -->
+    <div class="msg-row left">
+      <div class="avatar"><img src="https://api.dicebear.com/7.x/thumbs/svg?seed=cat" alt="猫猫"></div>
+      <div class="bubble">
+        <div>我还拍了其他照片，你看看！</div>
+        <div class="gallery-grid">
+          <img src="https://picsum.photos/id/1016/300/300" alt="照片1">
+          <img src="https://picsum.photos/id/1018/300/300" alt="照片2">
+          <img src="https://picsum.photos/id/1019/300/300" alt="照片3">
+          <img src="https://picsum.photos/id/1021/300/300" alt="照片4">
+        </div>
+      </div>
+    </div>
+
+    <!-- 第4条：右侧，带单张图 -->
+    <div class="msg-row right">
+      <div class="bubble">
+        <div>哇，风景真好！这是在哪儿拍的？</div>
+        <img class="single-img" src="https://picsum.photos/id/1022/400/300" alt="风景图">
+      </div>
+      <div class="avatar"><img src="https://api.dicebear.com/7.x/thumbs/svg?seed=me" alt="兔兔"></div>
+    </div>
+
   </div>
-
-  <!-- 你想加多少条，就继续往下复制上面的整个 <div class="msg-left">...</div> 或 <div class="msg-right">...</div> 区块 -->
-
 </div>
+
+<!-- 点击放大的黑色背景层 -->
+<div id="lightbox" onclick="this.style.display='none'">
+  <img id="lightboxImg" src="" alt="放大预览">
+</div>
+
+<!-- 🚀 交互脚本 -->
+<script>
+  // 等页面内容加载完毕后再执行
+  document.addEventListener("DOMContentLoaded", function() {
+    const images = document.querySelectorAll('.gallery-grid img, .single-img');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+
+    images.forEach(img => {
+      img.addEventListener('click', function(e) {
+        lightboxImg.src = this.src;
+        lightbox.style.display = 'flex';
+        e.stopPropagation(); // 阻止事件冒泡
+      });
+    });
+
+    // 点击遮罩层关闭预览
+    lightbox.addEventListener('click', function() {
+      this.style.display = 'none';
+    });
+  });
+</script>
 
 </body>
 </html>
-<div id="lightbox" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:999; justify-content:center; align-items:center;" onclick="this.style.display='none'">
-  <img id="lightboxImg" src="" style="max-width:90%; max-height:90%; border-radius:8px;">
-</div>
-<script>
-  // 给所有图片加上点击事件
-  document.querySelectorAll('.gallery-grid img, .single-img').forEach(img => {
-    img.style.cursor = 'pointer';
-    img.onclick = function() {
-      document.getElementById('lightboxImg').src = this.src;
-      document.getElementById('lightbox').style.display = 'flex';
-    }
-  });
-</script>
-<!-- 把这段代码放到 <div class="wrap"> 里面，或者页面的顶部 -->
-<div style="background: #ffffff; padding: 16px; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-  <h3 style="margin-top: 0;">🎵 我的歌单</h3>
-  <!-- 这是一个 HTML5 音乐播放器，controls 表示显示播放按钮 -->
-  <!-- src 里的链接可以是网络上的 mp3 链接，也可以是你上传到 GitHub 的音频文件 -->
-  <audio controls style="width: 100%;">
-    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-    你的浏览器不支持音频播放。
-  </audio>
-</div>
