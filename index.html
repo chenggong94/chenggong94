@@ -1,62 +1,23 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>我的对话框</title>
-<style>
-  body { margin: 0; font-family: system-ui; background: #f0f2f5; line-height: 1.6; }
-  .wrap { max-width: 680px; margin: 0 auto; padding: 20px; }
-  
-  /* 聊天容器 */
-  .chat-container { display: flex; flex-direction: column; gap: 20px; margin-top: 20px; }
-  
-  /* 每一条消息 */
-  .message { display: flex; gap: 10px; max-width: 85%; }
-  
-  /* 左侧消息（别人发的） */
-  .message.left { align-self: flex-start; }
-  
-  /* 右侧消息（你自己发的） */
-  .message.right { align-self: flex-end; flex-direction: row-reverse; }
-  
-  /* 头像 */
-  .avatar { width: 40px; height: 40px; border-radius: 50%; background: #ccc; object-fit: cover; }
-  
-  /* 文字气泡 */
-  .bubble { background: #ffffff; padding: 12px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-  .message.left .bubble { border-top-left-radius: 0; }
-  .message.right .bubble { background: #4f46e5; color: white; border-top-right-radius: 0; }
-  
-  /* 气泡里的图片 */
-  .bubble img { max-width: 100%; border-radius: 8px; margin-top: 8px; display: block; }
-</style>
-</head>
-<body>
-<div class="wrap">
-  
-  <div class="chat-container">
-    
-    <!-- 左侧消息：别人发的 -->
-    <div class="message left">
-      <img class="avatar" src="https://github.com/identicons/chenggong94.png" alt="头像">
-      <div class="bubble">
-        <p>猫猫，我今天又实现了规划里的小目标！</p>
-        <!-- 这里是图片 -->
-        <img src="https://picsum.photos/200/150" alt="配图">
-      </div>
-    </div>
+import { ChatContainer, type ChatMessageType } from '@rqdhw3n/react-chat-ui';
+import '@rqdhw3n/react-chat-ui/styles';
 
-    <!-- 右侧消息：你自己发的 -->
-    <div class="message right">
-      <img class="avatar" src="https://github.com/identicons/chenggong94.png" alt="头像">
-      <div class="bubble">
-        <p>太棒了！恭喜兔兔迈出人生的一大步！</p>
-      </div>
-    </div>
-    
-  </div>
+const messages: ChatMessageType[] = [
+  { id: '1', role: 'user', content: 'Hello', createdAt: new Date() },
+  { id: '2', role: 'assistant', content: 'Hi, how can I help you?', createdAt: new Date() },
+];
 
-</div>
-</body>
-</html>
+export default function App() {
+  return (
+    <div className="h-[600px] w-full max-w-3xl mx-auto p-4">
+      <ChatContainer
+        messages={messages}
+        loading={false}
+        onSend={(message) => console.log(message)}
+        placeholder="Ask something..."
+        theme="system"
+        allowAttachments
+        maxAttachments={5}
+      />
+    </div>
+  );
+}
