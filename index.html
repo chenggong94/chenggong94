@@ -9,111 +9,76 @@
   body { 
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background: #f3f4f6;
-    height: 100vh; /* 强制占满屏幕高度 */
+    height: 100vh;
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* 禁止整个页面滚动 */
+    overflow: hidden;
   }
-
-  /* 1. 顶部导航栏（固定） */
   .header {
-    height: 56px;
-    background: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 17px;
-    color: #333;
-    border-bottom: 1px solid #e5e7eb;
-    z-index: 10;
+    height: 56px; background: #ffffff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; font-size: 17px; color: #333;
+    border-bottom: 1px solid #e5e7eb; z-index: 10;
   }
-
-  /* 2. 聊天记录区域（可滚动） */
   .chat-area {
-    flex: 1; /* 占据中间所有剩余空间 */
-    overflow-y: auto; /* 允许上下滚动 */
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+    flex: 1; overflow-y: auto; padding: 16px;
+    display: flex; flex-direction: column; gap: 16px;
   }
-
-  /* 消息气泡（沿用之前的美化） */
   .msg-row { display: flex; align-items: flex-start; width: 100%; }
   .msg-row.left { justify-content: flex-start; }
   .msg-row.right { justify-content: flex-end; }
-
   .avatar { width: 40px; height: 40px; border-radius: 50%; background: #ccc; overflow: hidden; flex-shrink: 0; }
   .avatar img { width: 100%; height: 100%; object-fit: cover; }
   .msg-row.left .avatar { margin-right: 10px; }
   .msg-row.right .avatar { margin-left: 10px; }
-
   .bubble {
-    max-width: 75%;
-    padding: 12px 16px;
-    font-size: 15px;
-    line-height: 1.5;
-    word-wrap: break-word;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    max-width: 75%; padding: 12px 16px; font-size: 15px; line-height: 1.5;
+    word-wrap: break-word; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   }
   .msg-row.left .bubble { background: #ffffff; color: #333; border-radius: 0px 18px 18px 18px; }
   .msg-row.right .bubble { background: #5b6ef5; color: #ffffff; border-radius: 18px 0px 18px 18px; }
   
-  /* 图片网格 */
   .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; margin-top: 8px; border-radius: 8px; overflow: hidden; max-width: 220px; }
   .gallery-grid img { width: 100%; height: 100px; object-fit: cover; cursor: pointer; }
   .single-img { width: 100%; max-width: 200px; border-radius: 8px; margin-top: 8px; display: block; }
 
-  /* 3. 底部输入框（固定） */
   .input-area {
-    height: 60px;
-    background: #ffffff;
-    display: flex;
-    align-items: center;
-    padding: 0 12px;
-    gap: 8px;
-    border-top: 1px solid #e5e7eb;
-    z-index: 10;
+    height: 60px; background: #ffffff; display: flex; align-items: center;
+    padding: 0 12px; gap: 8px; border-top: 1px solid #e5e7eb; z-index: 10;
   }
   .input-area input {
-    flex: 1;
-    height: 40px;
-    border: 1px solid #d1d5db;
-    border-radius: 20px;
-    padding: 0 16px;
-    font-size: 15px;
-    outline: none;
-    background: #f9fafb;
+    flex: 1; height: 40px; border: 1px solid #d1d5db; border-radius: 20px;
+    padding: 0 16px; font-size: 15px; outline: none; background: #f9fafb;
   }
   .input-area input:focus { border-color: #5b6ef5; background: #fff; }
   .input-area button {
-    width: 40px; height: 40px;
-    border: none;
-    border-radius: 50%;
-    background: #5b6ef5;
-    color: white;
-    font-size: 18px;
+    width: 40px; height: 40px; border: none; border-radius: 50%;
+    background: #5b6ef5; color: white; font-size: 18px;
     display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    flex-shrink: 0;
+    cursor: pointer; flex-shrink: 0; transition: 0.2s;
   }
   .input-area button:active { transform: scale(0.95); }
+  /* 图片预览弹窗 */
+  .overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+    z-index: 999; justify-content: center; align-items: center; cursor: pointer;
+  }
+  .overlay.active { display: flex; }
+  .overlay img { max-width: 90%; max-height: 90%; border-radius: 8px; }
 </style>
 </head>
 <body>
 
-  <!-- 顶部栏 -->
   <div class="header">和猫猫૭的聊天</div>
 
-  <!-- 聊天内容区（滚动） -->
-  <div class="chat-area">
-    
+  <div class="chat-area" id="chatArea">
+    <!-- 初始聊天记录 -->
     <div class="msg-row left">
       <div class="avatar"><img src="https://api.dicebear.com/7.x/thumbs/svg?seed=cat" alt="猫猫"></div>
       <div class="bubble">
         <div>猫猫，我今天又实现了规划里的小目标！</div>
-        <img class="single-img" src="https://imagetourl.im/api/storage/file?key=anon%2F-%2F8208589618697-721e2364-a913-4f72-baa3-8a2427d59aa7-19992.jpg" alt="19992" />" 
+        <!-- 注意这里的引号已经修复，换成你自己的图片链接 -->
+        <img class="single-img" src="https://imagetourl.im/api/storage/file?key=anon%2F-%2F8208589618697-721e2364-a913-4f72-baa3-8a2427d59aa7-19992.jpg" alt="照片" />
       </div>
     </div>
 
@@ -127,22 +92,98 @@
       <div class="bubble">
         <div>我还拍了其他照片，你看看！</div>
         <div class="gallery-grid">
-          <img src="https://picsum.photos/id/1016/300/300">
-          <img src="https://picsum.photos/id/1018/300/300">
-          <img src="https://picsum.photos/id/1019/300/300">
-          <img src="https://picsum.photos/id/1021/300/300">
+          <img src="https://picsum.photos/id/1016/300/300" onclick="openImg(this.src)">
+          <img src="https://picsum.photos/id/1018/300/300" onclick="openImg(this.src)">
+          <img src="https://picsum.photos/id/1019/300/300" onclick="openImg(this.src)">
+          <img src="https://picsum.photos/id/1021/300/300" onclick="openImg(this.src)">
         </div>
       </div>
     </div>
-
   </div>
 
-  <!-- 底部输入框（目前只是外观，还不能真正打字发送） -->
+  <!-- 底部输入框（解锁版） -->
   <div class="input-area">
-    <button style="background: transparent; color: #666; font-size: 24px;">+</button>
-    <input type="text" placeholder="输入消息..." disabled>
-    <button>↑</button>
+    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+    <button style="background: transparent; color: #666; font-size: 24px;" onclick="document.getElementById('fileInput').click()">+</button>
+    <input type="text" id="msgInput" placeholder="输入消息...">
+    <button onclick="sendMessage()">↑</button>
   </div>
+
+  <div class="overlay" id="overlay" onclick="this.classList.remove('active')">
+    <img id="overlayImg" src="">
+  </div>
+
+<script>
+  // 1. 获取页面元素
+  const chatArea = document.getElementById('chatArea');
+  const msgInput = document.getElementById('msgInput');
+  const fileInput = document.getElementById('fileInput');
+
+  // 2. 发送文字消息
+  function sendMessage() {
+    const text = msgInput.value.trim();
+    if (!text) return; // 没字就不发
+
+    // 生成自己的消息气泡
+    const myMsgHTML = `
+      <div class="msg-row right">
+        <div class="bubble">${text}</div>
+        <div class="avatar"><img src="https://api.dicebear.com/7.x/thumbs/svg?seed=me" alt="兔兔"></div>
+      </div>
+    `;
+    chatArea.insertAdjacentHTML('beforeend', myMsgHTML);
+    
+    // 清空输入框并滚动到底部
+    msgInput.value = '';
+    chatArea.scrollTop = chatArea.scrollHeight;
+
+    // 3. 模拟对方回复（延迟0.8秒）
+    setTimeout(() => {
+      const replyHTML = `
+        <div class="msg-row left">
+          <div class="avatar"><img src="https://api.dicebear.com/7.x/thumbs/svg?seed=cat" alt="猫猫"></div>
+          <div class="bubble">收到啦！(๑•̀ㅂ•́)و✧</div>
+        </div>
+      `;
+      chatArea.insertAdjacentHTML('beforeend', replyHTML);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }, 800);
+  }
+
+  // 4. 发送图片
+  fileInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const imgSrc = event.target.result; // 把本地图片转换成网页能显示的代码
+      const imgHTML = `
+        <div class="msg-row right">
+          <div class="bubble">
+            <img class="single-img" src="${imgSrc}" onclick="openImg(this.src)">
+          </div>
+          <div class="avatar"><img src="https://api.dicebear.com/7.x/thumbs/svg?seed=me" alt="兔兔"></div>
+        </div>
+      `;
+      chatArea.insertAdjacentHTML('beforeend', imgHTML);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    };
+    reader.readAsDataURL(file);
+    fileInput.value = ''; // 清空文件选择
+  });
+
+  // 5. 点击图片放大预览
+  function openImg(src) {
+    document.getElementById('overlayImg').src = src;
+    document.getElementById('overlay').classList.add('active');
+  }
+
+  // 6. 按回车键也能发送
+  msgInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') sendMessage();
+  });
+</script>
 
 </body>
 </html>
