@@ -3,64 +3,95 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>聊天相册列表</title>
+<title>我的对话框</title>
 <style>
-  body { font-family: sans-serif; background: #f0f0f0; display: flex; justify-content: center; padding: 20px; }
-  .chat-container { width: 100%; max-width: 450px; background: #fff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; }
-  .chat-header { padding: 15px; background: #4a76a8; color: white; font-weight: bold; text-align: center; }
-  .chat-body { padding: 15px; height: 500px; overflow-y: auto; background: #e5e5e5; }
-  .msg-row { display: flex; margin-bottom: 15px; }
-  .msg-row.right { justify-content: flex-end; }
-  .bubble { max-width: 80%; padding: 10px; border-radius: 10px; background: white; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-  .msg-row.right .bubble { background: #dcf8c6; }
-  .text { font-size: 15px; margin-bottom: 8px; }
-  /* 相册网格核心样式 */
-  .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 5px; border-radius: 8px; overflow: hidden; }
-  .gallery-grid img { width: 100%; height: 100px; object-fit: cover; cursor: pointer; display: block; }
-  .gallery-grid img:hover { opacity: 0.9; }
-  /* 灯箱效果 */
-  .lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
-  .lightbox.active { display: flex; }
-  .lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; }
+  body { background-color: #f3f4f6; font-family: sans-serif; padding: 20px; }
+  .chat-container { max-width: 500px; margin: 0 auto; }
+  
+  /* 左侧消息 */
+  .msg-left { display: flex; margin-bottom: 20px; }
+  .msg-left .avatar { width: 40px; height: 40px; border-radius: 5px; background: #ccc; margin-right: 10px; flex-shrink: 0; overflow: hidden; }
+  .msg-left .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .msg-left .bubble { background: white; padding: 12px; border-radius: 0 10px 10px 10px; max-width: 75%; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+  
+  /* 右侧消息 */
+  .msg-right { display: flex; justify-content: flex-end; margin-bottom: 20px; }
+  .msg-right .avatar { width: 40px; height: 40px; border-radius: 5px; background: #ccc; margin-left: 10px; flex-shrink: 0; overflow: hidden; }
+  .msg-right .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .msg-right .bubble { background: #4f46e5; color: white; padding: 12px; border-radius: 10px 0 10px 10px; max-width: 75%; }
+  
+  /* 气泡里的文字 */
+  .text { font-size: 15px; line-height: 1.5; margin-bottom: 8px; }
+  
+  /* 单张图片的样式 */
+  .bubble img.single-img { width: 100%; border-radius: 5px; margin-top: 5px; display: block; }
+  
+  /* 相册网格样式（2张或4张图片的排版） */
+  .gallery-grid { 
+    display: grid; 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 5px; 
+    margin-top: 8px; 
+    border-radius: 8px; 
+    overflow: hidden; 
+  }
+  .gallery-grid img { 
+    width: 100%; 
+    height: 120px; 
+    object-fit: cover; 
+    cursor: pointer; 
+    display: block; 
+  }
 </style>
 </head>
 <body>
+
 <div class="chat-container">
-  <div class="chat-header">📸 旅行相册</div>
-  <div class="chat-body">
-    <div class="msg-row right">
-      <div class="bubble">
-        <div class="text">这次去海边拍了好多照片！</div>
-        <!-- 相册网格 -->
-        <div class="gallery-grid">
-          <img src="https://picsum.photos/id/1015/400/400" onclick="openLightbox(this.src)">
-          <img src="https://picsum.photos/id/1016/400/400" onclick="openLightbox(this.src)">
-          <img src="https://picsum.photos/id/1018/400/400" onclick="openLightbox(this.src)">
-          <img src="https://picsum.photos/id/1019/400/400" onclick="openLightbox(this.src)">
-          <img src="https://picsum.photos/id/1021/400/400" onclick="openLightbox(this.src)">
-        </div>
-      </div>
+
+  <!-- ============ 第1条：左侧，带单张图片 ============ -->
+  <div class="msg-left">
+    <div class="avatar"><img src="https://api.dicebear.com/7.x/thumbs/svg?seed=cat" alt="猫猫"></div>
+    <div class="bubble">
+      <div class="text">猫猫，我今天又实现了规划里的小目标！</div>
+      <img class="single-img" src="https://picsum.photos/id/1015/400/300" alt="阅读照片">
     </div>
-    <div class="msg-row">
-      <div class="bubble">
-        <div class="text">太美了！这是在哪里？</div>
+  </div>
+
+  <!-- ============ 第2条：右侧，纯文字回复 ============ -->
+  <div class="msg-right">
+    <div class="bubble">
+      <div class="text">太棒了！恭喜兔兔迈出人生的一大步！</div>
+    </div>
+    <div class="avatar"><img src="https://api.dicebear.com/7.x/thumbs/svg?seed=me" alt="兔兔"></div>
+  </div>
+
+  <!-- ============ 第3条：左侧，像相册一样带4张图 ============ -->
+  <div class="msg-left">
+    <div class="avatar"><img src="https://api.dicebear.com/7.x/thumbs/svg?seed=cat" alt="猫猫"></div>
+    <div class="bubble">
+      <div class="text">我还拍了其他照片，你看看！</div>
+      <!-- 相册网格：2x2排列 -->
+      <div class="gallery-grid">
+        <img src="https://picsum.photos/id/1016/300/300" alt="照片1">
+        <img src="https://picsum.photos/id/1018/300/300" alt="照片2">
+        <img src="https://picsum.photos/id/1019/300/300" alt="照片3">
+        <img src="https://picsum.photos/id/1021/300/300" alt="照片4">
       </div>
     </div>
   </div>
+
+  <!-- ============ 第4条：右侧，带单张图 ============ -->
+  <div class="msg-right">
+    <div class="bubble">
+      <div class="text">哇，风景真好！这是在哪儿拍的？</div>
+      <img class="single-img" src="https://picsum.photos/id/1022/400/300" alt="风景图">
+    </div>
+    <div class="avatar"><img src="https://api.dicebear.com/7.x/thumbs/svg?seed=me" alt="兔兔"></div>
+  </div>
+
+  <!-- 你想加多少条，就继续往下复制上面的整个 <div class="msg-left">...</div> 或 <div class="msg-right">...</div> 区块 -->
+
 </div>
 
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <img id="lightboxImg" src="">
-</div>
-
-<script>
-  function openLightbox(src) {
-    document.getElementById('lightboxImg').src = src;
-    document.getElementById('lightbox').classList.add('active');
-  }
-  function closeLightbox() {
-    document.getElementById('lightbox').classList.remove('active');
-  }
-</script>
 </body>
 </html>
