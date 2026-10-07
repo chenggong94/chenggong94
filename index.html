@@ -3,158 +3,112 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>我的专属空间</title>
+<title>我的专属聊天</title>
 <style>
-  /* 基础重置 */
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    padding: 0;
-    background-color: #eef2f6;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    -webkit-tap-highlight-color: transparent;
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f3f4f6;
+    height: 100vh; /* 强制占满屏幕高度 */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* 禁止整个页面滚动 */
   }
 
-  /* 整体容器，模拟手机 App 界面 */
-  .app-container {
-    max-width: 600px;
-    margin: 0 auto;
+  /* 1. 顶部导航栏（固定） */
+  .header {
+    height: 56px;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 17px;
+    color: #333;
+    border-bottom: 1px solid #e5e7eb;
+    z-index: 10;
+  }
+
+  /* 2. 聊天记录区域（可滚动） */
+  .chat-area {
+    flex: 1; /* 占据中间所有剩余空间 */
+    overflow-y: auto; /* 允许上下滚动 */
     padding: 16px;
     display: flex;
     flex-direction: column;
     gap: 16px;
   }
 
-  /* 顶部音乐卡片 */
-  .music-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
-    border-radius: 20px;
-    padding: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .music-card h3 { margin: 0; font-size: 16px; color: #333; display: flex; align-items: center; gap: 6px; }
-  .music-card audio { width: 100%; height: 40px; outline: none; }
-
-  /* 聊天主容器 */
-  .chat-container {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    padding-bottom: 40px;
-  }
-
-  /* 消息行通用布局 */
+  /* 消息气泡（沿用之前的美化） */
   .msg-row { display: flex; align-items: flex-start; width: 100%; }
   .msg-row.left { justify-content: flex-start; }
   .msg-row.right { justify-content: flex-end; }
 
-  /* 头像 */
-  .avatar {
-    width: 42px; height: 42px;
-    border-radius: 50%;
-    overflow: hidden;
-    flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; background: #ccc; overflow: hidden; flex-shrink: 0; }
   .avatar img { width: 100%; height: 100%; object-fit: cover; }
   .msg-row.left .avatar { margin-right: 10px; }
   .msg-row.right .avatar { margin-left: 10px; }
 
-  /* 气泡基础样式 */
   .bubble {
-    max-width: 78%;
+    max-width: 75%;
     padding: 12px 16px;
     font-size: 15px;
-    line-height: 1.6;
+    line-height: 1.5;
     word-wrap: break-word;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   }
+  .msg-row.left .bubble { background: #ffffff; color: #333; border-radius: 0px 18px 18px 18px; }
+  .msg-row.right .bubble { background: #5b6ef5; color: #ffffff; border-radius: 18px 0px 18px 18px; }
+  
+  /* 图片网格 */
+  .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; margin-top: 8px; border-radius: 8px; overflow: hidden; max-width: 220px; }
+  .gallery-grid img { width: 100%; height: 100px; object-fit: cover; cursor: pointer; }
+  .single-img { width: 100%; max-width: 200px; border-radius: 8px; margin-top: 8px; display: block; }
 
-  /* 左侧气泡（别人发的） */
-  .msg-row.left .bubble {
+  /* 3. 底部输入框（固定） */
+  .input-area {
+    height: 60px;
     background: #ffffff;
-    color: #333;
-    border-radius: 0px 20px 20px 20px; /* 左上角直角，其余圆角 */
-  }
-
-  /* 右侧气泡（你自己发的） */
-  .msg-row.right .bubble {
-    background: #5b6ef5; /* 温和的蓝紫色 */
-    color: #ffffff;
-    border-radius: 20px 0px 20px 20px; /* 右上角直角，其余圆角 */
-  }
-
-  /* 气泡里的图片 */
-  .bubble .single-img {
-    width: 100%;
-    max-width: 260px; /* 防止单张图过大 */
-    border-radius: 12px;
-    margin-top: 8px;
-    display: block;
-    cursor: pointer;
-  }
-
-  /* 相册网格 */
-  .gallery-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 6px;
-    margin-top: 10px;
-    border-radius: 12px;
-    overflow: hidden;
-    max-width: 260px;
-  }
-  .gallery-grid img {
-    width: 100%;
-    height: 125px;
-    object-fit: cover;
-    cursor: pointer;
-    display: block;
-  }
-
-  /* 点击放大的黑色遮罩层 */
-  #lightbox {
-    display: none; 
-    position: fixed; 
-    top: 0; left: 0; 
-    width: 100%; height: 100%; 
-    background: rgba(0, 0, 0, 0.92); 
-    z-index: 9999; 
-    justify-content: center; 
+    display: flex;
     align-items: center;
-    backdrop-filter: blur(5px);
+    padding: 0 12px;
+    gap: 8px;
+    border-top: 1px solid #e5e7eb;
+    z-index: 10;
   }
-  #lightbox img { 
-    max-width: 95%; 
-    max-height: 95%; 
-    border-radius: 8px; 
-    object-fit: contain;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  .input-area input {
+    flex: 1;
+    height: 40px;
+    border: 1px solid #d1d5db;
+    border-radius: 20px;
+    padding: 0 16px;
+    font-size: 15px;
+    outline: none;
+    background: #f9fafb;
   }
+  .input-area input:focus { border-color: #5b6ef5; background: #fff; }
+  .input-area button {
+    width: 40px; height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: #5b6ef5;
+    color: white;
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .input-area button:active { transform: scale(0.95); }
 </style>
 </head>
 <body>
 
-<div class="app-container">
-  
-  <!-- 🎵 音乐播放器区域 -->
-  <div class="music-card">
-    <h3>🎵 我的专属歌单</h3>
-    <audio controls>
-      <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-      你的浏览器不支持音频播放。
-    </audio>
-  </div>
+  <!-- 顶部栏 -->
+  <div class="header">和猫猫૭的聊天</div>
 
-  <!-- 💬 聊天对话区域 -->
-  <div class="chat-container">
+  <!-- 聊天内容区（滚动） -->
+  <div class="chat-area">
     
-    <!-- 第1条：左侧，带单张图 -->
     <div class="msg-row left">
       <div class="avatar"><img src="https://api.dicebear.com/7.x/thumbs/svg?seed=cat" alt="猫猫"></div>
       <div class="bubble">
@@ -163,65 +117,32 @@
       </div>
     </div>
 
-    <!-- 第2条：右侧，纯文字 -->
     <div class="msg-row right">
-      <div class="bubble">太棒了！恭喜兔兔迈出人生的一大步！</div>
+      <div class="bubble">揉揉兔头</div>
       <div class="avatar"><img src="https://api.dicebear.com/7.x/thumbs/svg?seed=me" alt="兔兔"></div>
     </div>
 
-    <!-- 第3条：左侧，相册网格 (4张图) -->
     <div class="msg-row left">
       <div class="avatar"><img src="https://api.dicebear.com/7.x/thumbs/svg?seed=cat" alt="猫猫"></div>
       <div class="bubble">
         <div>我还拍了其他照片，你看看！</div>
         <div class="gallery-grid">
-          <img src="https://picsum.photos/id/1016/300/300" alt="照片1">
-          <img src="https://picsum.photos/id/1018/300/300" alt="照片2">
-          <img src="https://picsum.photos/id/1019/300/300" alt="照片3">
-          <img src="https://picsum.photos/id/1021/300/300" alt="照片4">
+          <img src="https://picsum.photos/id/1016/300/300">
+          <img src="https://picsum.photos/id/1018/300/300">
+          <img src="https://picsum.photos/id/1019/300/300">
+          <img src="https://picsum.photos/id/1021/300/300">
         </div>
       </div>
     </div>
 
-    <!-- 第4条：右侧，带单张图 -->
-    <div class="msg-row right">
-      <div class="bubble">
-        <div>哇，风景真好！这是在哪儿拍的？</div>
-        <img class="single-img" src="https://picsum.photos/id/1022/400/300" alt="风景图">
-      </div>
-      <div class="avatar"><img src="https://api.dicebear.com/7.x/thumbs/svg?seed=me" alt="兔兔"></div>
-    </div>
-
   </div>
-</div>
 
-<!-- 点击放大的黑色背景层 -->
-<div id="lightbox" onclick="this.style.display='none'">
-  <img id="lightboxImg" src="" alt="放大预览">
-</div>
-
-<!-- 🚀 交互脚本 -->
-<script>
-  // 等页面内容加载完毕后再执行
-  document.addEventListener("DOMContentLoaded", function() {
-    const images = document.querySelectorAll('.gallery-grid img, .single-img');
-    const lightbox = document.getElementById('lightbox');
-    const lightboxImg = document.getElementById('lightboxImg');
-
-    images.forEach(img => {
-      img.addEventListener('click', function(e) {
-        lightboxImg.src = this.src;
-        lightbox.style.display = 'flex';
-        e.stopPropagation(); // 阻止事件冒泡
-      });
-    });
-
-    // 点击遮罩层关闭预览
-    lightbox.addEventListener('click', function() {
-      this.style.display = 'none';
-    });
-  });
-</script>
+  <!-- 底部输入框（目前只是外观，还不能真正打字发送） -->
+  <div class="input-area">
+    <button style="background: transparent; color: #666; font-size: 24px;">+</button>
+    <input type="text" placeholder="输入消息..." disabled>
+    <button>↑</button>
+  </div>
 
 </body>
 </html>
