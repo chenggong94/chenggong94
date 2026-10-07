@@ -3,24 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>我的专属聊天 + 音乐</title>
-
-<!-- ===== 1. quikchat 样式 ===== -->
-<link rel="stylesheet" href="https://unpkg.com/quikchat/dist/quikchat.css" />
-
-<!-- ===== 2. quikchat 脚本 ===== -->
-<script src="https://unpkg.com/quikchat"></script>
-
-<!-- ===== 3. WPWebPlayer 样式与脚本 ===== -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/wpwebplayer@1.1.5/min-css.css">
-<script src="https://cdn.jsdelivr.net/npm/wpwebplayer@1.1.5/min-js.js"></script>
-
+<title>我的专属聊天</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: #f3f4f6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f2f2f7;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -28,112 +17,291 @@
     height: 100vh;
   }
 
-  /* 顶部标题栏 */
+  /* 顶部栏 */
   .header {
-    height: 52px;
-    background: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 17px;
-    color: #333;
-    border-bottom: 1px solid #e5e7eb;
-    z-index: 10;
+    height: 52px; background: #ffffff; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 17px; color: #333;
+    border-bottom: 1px solid #e5e7eb; z-index: 10;
     padding-top: env(safe-area-inset-top);
-    flex-shrink: 0;
   }
 
-  /* 聊天区容器 */
-  #chatContainer {
-    flex: 1;
-    width: 100%;
-    min-height: 0;
-    overflow: hidden;
+  /* 聊天滚动区 */
+  .chat-area {
+    flex: 1; overflow-y: auto; padding: 16px;
+    display: flex; flex-direction: column; gap: 16px;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  .chat-area::-webkit-scrollbar { width: 4px; }
+  .chat-area::-webkit-scrollbar-thumb { background: #c7c7cc; border-radius: 4px; }
+
+  /* 消息行 */
+  .msg-row { display: flex; align-items: flex-start; width: 100%; }
+  .msg-row.left { justify-content: flex-start; }
+  .msg-row.right { justify-content: flex-end; }
+
+  .avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    flex-shrink: 0; overflow: hidden; background: #ddd;
+  }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .msg-row.left .avatar { margin-right: 10px; }
+  .msg-row.right .avatar { margin-left: 10px; }
+
+  .bubble {
+    max-width: 75%; padding: 10px 14px; font-size: 15px;
+    line-height: 1.5; word-wrap: break-word; border-radius: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .msg-row.left .bubble {
+    background: #ffffff; color: #1c1c1e;
+    border-top-left-radius: 4px;
+  }
+  .msg-row.right .bubble {
+    background: #5b6ef5; color: #ffffff;
+    border-top-right-radius: 4px;
   }
 
-  /* 底部音乐播放器区域 */
+  /* 图片 */
+  .bubble .single-img {
+    max-width: 100%; border-radius: 10px; margin-top: 8px;
+    display: block; cursor: pointer;
+  }
+  .bubble .gallery-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 4px; margin-top: 8px; width: 100%;
+    border-radius: 10px; overflow: hidden;
+  }
+  .bubble .gallery-grid img {
+    width: 100%; height: 110px; object-fit: cover;
+    cursor: pointer; display: block;
+  }
+
+  /* 时间戳 */
+  .timestamp {
+    text-align: center; font-size: 12px; color: #8e8e93;
+    margin: 4px 0 8px 0;
+  }
+
+  /* 底部音乐条 + 输入条 */
+  .footer {
+    flex-shrink: 0; background: #ffffff; border-top: 1px solid #e5e7eb;
+    padding-bottom: env(safe-area-inset-bottom); z-index: 10;
+  }
   .music-bar {
-    flex-shrink: 0;
-    padding: 8px 12px;
-    padding-bottom: calc(8px + env(safe-area-inset-bottom));
-    background: #ffffff;
-    border-top: 1px solid #e5e7eb;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: 6px 12px; display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid #f0f0f5;
   }
+  .music-bar audio { width: 100%; height: 32px; }
+
+  .input-area {
+    padding: 8px 12px; display: flex; align-items: center; gap: 8px;
+  }
+  .input-area input[type="text"] {
+    flex: 1; height: 40px; border: 1px solid #d1d5db;
+    border-radius: 20px; padding: 0 16px; font-size: 15px;
+    outline: none; background: #f9fafb;
+  }
+  .input-area input[type="text"]:focus { border-color: #5b6ef5; background: #fff; }
+  .input-area button {
+    width: 40px; height: 40px; border: none; border-radius: 50%;
+    background: #5b6ef5; color: white; font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0; transition: transform 0.15s;
+  }
+  .input-area button:active { transform: scale(0.92); }
+  .input-area .attach-btn { background: #e5e5ea; color: #1c1c1e; font-size: 22px; }
+
+  /* 图片预览弹窗 */
+  .overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.88); z-index: 999;
+    justify-content: center; align-items: center; cursor: pointer;
+    padding: 20px;
+  }
+  .overlay.active { display: flex; }
+  .overlay img { max-width: 100%; max-height: 100%; border-radius: 8px; }
 </style>
 </head>
 <body>
 
   <div class="header">和猫猫૭的聊天</div>
 
-  <div id="chatContainer"></div>
+  <div class="chat-area" id="chatArea"></div>
 
-  <div class="music-bar">
-    <wp-music-player
-      src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-      title="背景音乐"
-      artist="我的歌单"
-      cover="https://picsum.photos/id/1015/200/200"
-      autoplay="false"
-      loop="true"
-      volume="0.3"
-      fixed="false"
-      mini="true"
-      theme="#5b6ef5">
-    </wp-music-player>
+  <div class="footer">
+    <!-- 音乐播放条：把 src 换成你自己的音乐链接 -->
+    <div class="music-bar">
+      <audio controls loop preload="none">
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+        你的浏览器不支持音频播放
+      </audio>
+    </div>
+    <!-- 输入栏 -->
+    <div class="input-area">
+      <input type="file" id="fileInput" accept="image/*" style="display:none;">
+      <button class="attach-btn" onclick="document.getElementById('fileInput').click()">＋</button>
+      <input type="text" id="msgInput" placeholder="输入消息...">
+      <button onclick="sendMessage()">↑</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay" onclick="this.classList.remove('active')">
+    <img id="overlayImg" src="">
   </div>
 
 <script>
-  // ========== 1. 初始化 quikchat 聊天组件 ==========
-  const chat = new quikchat('#chatContainer', async (chat, userMessage) => {
-    chat.messageAddNew(userMessage, 'me', 'right', 'user');
+/* ============ 配置区（想改的话改这里就行） ============ */
+const CONFIG = {
+  myAvatar: 'https://api.dicebear.com/7.x/thumbs/svg?seed=me',
+  otherAvatar: 'https://api.dicebear.com/7.x/thumbs/svg?seed=cat',
+  // 自动回复的句子（随机挑一条）
+  autoReplies: [
+    '收到啦！(๑•̀ㅂ•́)و✧',
+    '嗯嗯，我看到了～',
+    '兔兔好棒！',
+    '哈哈哈，这个我喜欢',
+    '等我回复你哦',
+    '好的呀，继续加油！'
+  ],
+  // 预设的初始聊天记录（你可以随意增减）
+  initialMessages: [
+    { side: 'left', text: '猫猫，我今天又实现了规划里的小目标！',
+      image: 'https://picsum.photos/id/1015/400/300' },
+    { side: 'right', text: '太棒了！恭喜兔兔迈出人生的一大步！' },
+    { side: 'left', text: '我还拍了其他照片，你看看！',
+      gallery: [
+        'https://picsum.photos/id/1016/300/300',
+        'https://picsum.photos/id/1018/300/300',
+        'https://picsum.photos/id/1019/300/300',
+        'https://picsum.photos/id/1021/300/300'
+      ] },
+    { side: 'right', text: '哇，风景真好！这是在哪儿拍的？' },
+    { side: 'left', text: '就在我们上次说想去的那座山里！下次带你去～' },
+    { side: 'right', text: '好耶！那我可要开始期待了 ✨' },
+    { side: 'left', text: '对了，你最近在听什么歌？',
+      image: 'https://picsum.photos/id/1022/400/300' },
+    { side: 'right', text: '给你看看我最近循环的一首 👇' },
+    { side: 'right', text: '（底部播放器已加载，可以点播放听听）' },
+    { side: 'left', text: '谢谢猫猫！今晚就听这个啦 🎵' }
+  ]
+};
+/* ===================================================== */
 
-    const typingId = chat.messageAddTypingIndicator('猫猫');
-    setTimeout(() => {
-      chat.messageRemove(typingId);
-      chat.messageAddNew('收到啦！(๑•̀ㅂ•́)و✧', '猫猫', 'left', 'assistant');
-    }, 800);
-  }, {
-    theme: 'quikchat-theme-light',
-    trackHistory: true,
-    titleArea: { title: '和猫猫૭的聊天', show: false },
-    showTimestamps: true,
-    sanitize: false // ⚠️ 重点：必须改成 false，否则 HTML 标签会被显示成文字！
-  });
+const chatArea = document.getElementById('chatArea');
+const msgInput = document.getElementById('msgInput');
+const fileInput = document.getElementById('fileInput');
+const overlay = document.getElementById('overlay');
+const overlayImg = document.getElementById('overlayImg');
 
-  // ========== 2. 预设初始聊天记录（相册网格 + 图片） ==========
-  // 注意：使用了 sanitize: false 后，图片可以直接正常渲染。
-  
-  // 单张图片消息
-  chat.messageAddNew(
-    '<div>猫猫，我今天又实现了规划里的小目标！</div>' +
-    '<img src="https://imagetourl.im/api/storage/file?key=anon%2F-%2F8208589618697-721e2364-a913-4f72-baa3-8a2427d59aa7-19992.jpg" style="max-width:100%; border-radius:8px; margin-top:8px; display:block;" />',
-    '兔兔',
-    'left',
-    'user'
-  );
+/* 打开图片预览 */
+function openImg(src) {
+  overlayImg.src = src;
+  overlay.classList.add('active');
+}
 
-  // 纯文字回复
-  chat.messageAddNew('揉揉兔头', '猫猫', 'right', 'assistant');
+/* 渲染一条消息 */
+function renderMessage(side, text, image, gallery, save = true) {
+  const row = document.createElement('div');
+  row.className = 'msg-row ' + side;
 
-  // 相册网格（4图）
-  chat.messageAddNew(
-    '<div>我还拍了其他照片，你看看！</div>' +
-    '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:4px;margin-top:8px;width:100%;">' +
-      '<img src="https://picsum.photos/id/1016/300/300" style="width:100%;height:100px;object-fit:cover;border-radius:4px;" />' +
-      '<img src="https://picsum.photos/id/1018/300/300" style="width:100%;height:100px;object-fit:cover;border-radius:4px;" />' +
-      '<img src="https://picsum.photos/id/1019/300/300" style="width:100%;height:100px;object-fit:cover;border-radius:4px;" />' +
-      '<img src="https://picsum.photos/id/1021/300/300" style="width:100%;height:100px;object-fit:cover;border-radius:4px;" />' +
-    '</div>',
-    '兔兔',
-    'left',
-    'user'
-  );
+  const avatar = document.createElement('div');
+  avatar.className = 'avatar';
+  const avatarImg = document.createElement('img');
+  avatarImg.src = side === 'left' ? CONFIG.otherAvatar : CONFIG.myAvatar;
+  avatar.appendChild(avatarImg);
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+
+  if (text) {
+    const textNode = document.createElement('div');
+    textNode.textContent = text;
+    bubble.appendChild(textNode);
+  }
+
+  if (image) {
+    const img = document.createElement('img');
+    img.className = 'single-img';
+    img.src = image;
+    img.onclick = () => openImg(image);
+    bubble.appendChild(img);
+  }
+
+  if (gallery && gallery.length) {
+    const grid = document.createElement('div');
+    grid.className = 'gallery-grid';
+    gallery.forEach(src => {
+      const gImg = document.createElement('img');
+      gImg.src = src;
+      gImg.onclick = () => openImg(src);
+      grid.appendChild(gImg);
+    });
+    bubble.appendChild(grid);
+  }
+
+  if (side === 'left') {
+    row.appendChild(avatar);
+    row.appendChild(bubble);
+  } else {
+    row.appendChild(bubble);
+    row.appendChild(avatar);
+  }
+
+  chatArea.appendChild(row);
+  chatArea.scrollTop = chatArea.scrollHeight;
+
+  // 保存到本地（刷新不丢）
+  if (save) {
+    const history = JSON.parse(localStorage.getItem('chat_history') || '[]');
+    history.push({ side, text, image, gallery });
+    localStorage.setItem('chat_history', JSON.stringify(history));
+  }
+}
+
+/* 发送文字消息 */
+function sendMessage() {
+  const text = msgInput.value.trim();
+  if (!text) return;
+  renderMessage('right', text);
+  msgInput.value = '';
+
+  // 延迟模拟回复
+  setTimeout(() => {
+    const reply = CONFIG.autoReplies[Math.floor(Math.random() * CONFIG.autoReplies.length)];
+    renderMessage('left', reply);
+  }, 700 + Math.random() * 500);
+}
+
+/* 发送本地图片 */
+fileInput.addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    renderMessage('right', '', ev.target.result);
+  };
+  reader.readAsDataURL(file);
+  fileInput.value = '';
+});
+
+/* 回车发送 */
+msgInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') sendMessage();
+});
+
+/* 初始化：如果本地有记录就显示记录，没有就显示预设消息 */
+(function init() {
+  const saved = JSON.parse(localStorage.getItem('chat_history') || 'null');
+  if (saved && saved.length) {
+    saved.forEach(m => renderMessage(m.side, m.text, m.image, m.gallery, false));
+  } else {
+    CONFIG.initialMessages.forEach(m =>
+      renderMessage(m.side, m.text, m.image, m.gallery, true)
+    );
+  }
+})();
 </script>
-
 </body>
 </html>
