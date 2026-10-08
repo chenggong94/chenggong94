@@ -7,7 +7,7 @@
 <style>
     /* 全局重置 */
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #333; display: flex; justify-content: center; padding: 20px; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #2c2c2c; display: flex; justify-content: center; padding: 20px; min-height: 100vh; align-items: center; }
 
     /* 手机模拟器容器 */
     .phone-screen {
@@ -236,7 +236,7 @@
     .page-4 {
         height: 100%;
         background-color: #1a1a1a;
-        background-image: url('https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'); /* 模拟木纹 */
+        background-image: url('https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');
         background-size: cover;
         background-position: center;
         display: flex;
@@ -277,7 +277,7 @@
         word-wrap: break-word;
     }
     .bubble-left {
-        background: #333; /* 在深色背景上稍微亮一点 */
+        background: #333;
         color: #fff;
         border-top-left-radius: 4px;
     }
@@ -333,11 +333,11 @@
         cursor: pointer;
     }
 
-    /* 页面切换控制按钮（用于演示） */
+    /* 演示导航按钮样式 */
     .nav-controls {
         position: absolute;
         top: 50%;
-        right: 10px;
+        right: -60px;
         transform: translateY(-50%);
         display: flex;
         flex-direction: column;
@@ -345,12 +345,178 @@
         z-index: 100;
     }
     .nav-btn {
-        background: rgba(255,255,255,0.7);
+        background: #4a90e2;
         border: none;
-        padding: 5px 10px;
+        padding: 8px 12px;
         border-radius: 5px;
         cursor: pointer;
         font-size: 12px;
-        color: #333;
+        color: #fff;
+        font-weight: bold;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
-</st
+    .nav-btn:hover { background: #357abd; }
+</style>
+</head>
+<body>
+
+<div style="position: relative;">
+    <!-- 演示按钮（为了展示4个页面） -->
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="showPage('page1')">1. 首页</button>
+        <button class="nav-btn" onclick="showPage('page2')">2. 弹窗</button>
+        <button class="nav-btn" onclick="showPage('page3')">3. 详情</button>
+        <button class="nav-btn" onclick="showPage('page4')">4. 聊天</button>
+    </div>
+
+    <div class="phone-screen">
+        <!-- 页面1：房间推荐 -->
+        <div class="page-1" id="page1">
+            <div class="header">
+                <div class="header-left"><span class="header-icon">❮</span></div>
+                <div class="header-title">🔥 房间推荐</div>
+                <div class="header-right"><span class="header-icon">🌐</span> 房间</div>
+            </div>
+            
+            <div class="section-title"><span>🔥</span> 热推的房间</div>
+
+            <div class="room-grid">
+                <div class="room-card" onclick="showPage('page2')" style="cursor:pointer;">
+                    <div class="room-img-container room-img-1">
+                        <div class="temp-badge">40℃</div>
+                    </div>
+                    <div class="room-info">
+                        <div class="room-name">塞西尔</div>
+                        <div class="room-desc">请你相信 你终将成为你喜欢的样子 你今天也很漂...</div>
+                        <div class="room-players">4人</div>
+                    </div>
+                </div>
+                <div class="room-card">
+                    <div class="room-img-container room-img-2">
+                        <div class="temp-badge">30℃</div>
+                    </div>
+                    <div class="room-info">
+                        <div class="room-name">箱庭</div>
+                        <div class="room-desc">一只深紫色菱格纹的手提箱。比羽毛重一些，较...</div>
+                        <div class="room-players">7人</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页面2：底部抽屉 -->
+        <div class="page-2-overlay" id="page2" style="display: none;">
+            <div class="bottom-sheet">
+                <div class="sheet-banner">
+                    <h2>箱庭</h2>
+                    <p>一只深紫色菱格纹的手提箱。比羽毛重一些，较金锭轻一些。由一道不算复杂的咒语开启。通往一处开阔的居所。其中罗列的门与窗数不胜数，各自通往不同的光景。这里不受“暴雨”的侵扰，可留存时代的印记。</p>
+                    <div class="banner-tags">
+                        <span>📹 视频分享</span>
+                        <span>👤 7人</span>
+                        <span>🛡️ 祭筱心</span>
+                    </div>
+                </div>
+                <div class="avatar-list">
+                    <div class="avatar-item"><div class="avatar-circle" style="background: #4a90e2;"></div><div class="avatar-name">祭筱心</div></div>
+                    <div class="avatar-item"><div class="avatar-circle" style="background: #e24a4a;"></div><div class="avatar-name">莲子心</div></div>
+                    <div class="avatar-item"><div class="avatar-circle" style="background: #50e3c2;"></div><div class="avatar-name">陌羽</div></div>
+                    <div class="avatar-item"><div class="avatar-circle" style="background: #f5a623;"></div><div class="avatar-name">北方花火</div></div>
+                    <div class="avatar-item"><div class="avatar-circle" style="background: #d0021b;"></div><div class="avatar-name">祭心</div></div>
+                    <div class="avatar-item"><div class="avatar-circle" style="background: #8b572a;"></div><div class="avatar-name">夜疏星</div></div>
+                    <div class="avatar-item"><div class="avatar-circle" style="background: #bd10e0;"></div><div class="avatar-name">错误</div></div>
+                </div>
+                <div class="action-list">
+                    <div class="action-item" onclick="showPage('page3')"><div class="action-icon icon-enter"></div>进入</div>
+                    <div class="action-item"><div class="action-icon icon-folder"></div>打开目录</div>
+                    <div class="action-item"><div class="action-icon icon-info"></div>查看房间资料</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页面3：详情页 -->
+        <div class="page-3" id="page3" style="display: none;">
+            <div class="detail-content">
+                <h1>箱庭</h1>
+                <div class="author">祭筱心</div>
+                <div class="desc">
+                    一只深紫色菱格纹的手提箱。比羽毛重一些，较金锭轻一些。由一道不算复杂的咒语开启。<br>
+                    通往一处开阔的居所。<br>
+                    其中罗列的门与窗数不胜数，各自通往不同的光景。这里不受“暴雨”的侵扰，可留存时代的印记。可预见的，将有许多神秘学家在此立足存身。
+                </div>
+                <div class="loading-bar">
+                    <span>⚙️ 载入中......</span>
+                    <div class="progress-bg"><div class="progress-fill"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页面4：聊天界面 -->
+        <div class="page-4" id="page4" style="display: none;">
+            <div class="chat-container">
+                <div class="msg-row msg-left">
+                    <div class="chat-avatar" style="background: #e0e0e0;"><img src="https://via.placeholder.com/36/4a90e2/fff?text=B" alt="bot"></div>
+                    <div class="msg-bubble bubble-left" style="padding: 0; background: none;">
+                        <div class="sticker">💙 [表情包]</div>
+                    </div>
+                </div>
+                
+                <div class="msg-row"><div class="bubble-system">上午 6:30</div></div>
+                
+                <div class="msg-row msg-left">
+                    <div class="chat-avatar" style="background: #f5a623;"><img src="https://via.placeholder.com/36/f5a623/fff?text=F" alt="fox"></div>
+                    <div class="msg-bubble bubble-left">感谢欢迎</div>
+                </div>
+                
+                <div class="msg-row msg-left">
+                    <div class="chat-avatar" style="background: #333;"><img src="https://via.placeholder.com/36/333/fff?text=U" alt="user"></div>
+                    <div class="msg-bubble bubble-left" style="background: #444;">♂ 咩咩咩 ⭐️</div>
+                </div>
+
+                <div class="msg-row"><div class="bubble-system">上午 6:32</div></div>
+
+                <div class="msg-row msg-right">
+                    <div class="msg-bubble bubble-left" style="background: #555;">♂ 怎么收抬你你是 ⭐️</div>
+                    <div class="chat-avatar" style="margin-right: 0; margin-left: 10px; background: #555;"><img src="https://via.placeholder.com/36/555/fff?text=U" alt="user"></div>
+                </div>
+
+                <div class="msg-row msg-left">
+                    <div class="chat-avatar" style="background: #4a90e2;"><img src="https://via.placeholder.com/36/4a90e2/fff?text=B" alt="bot"></div>
+                    <div class="msg-bubble bubble-left" style="padding: 0; background: none;">
+                        <div class="sticker" style="width: 160px;">
+                            欢迎 @怎么收抬你你是 老师<br>
+                            <span style="font-size: 24px; display: block; margin-top: 5px;">💙 [表情包]</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-input-bar">
+                <input type="text" class="chat-input" placeholder="说点什么...">
+                <div class="add-btn">+</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 简单的页面切换逻辑
+    function showPage(pageId) {
+        // 隐藏所有页面
+        document.getElementById('page1').style.display = 'none';
+        document.getElementById('page2').style.display = 'none';
+        document.getElementById('page3').style.display = 'none';
+        document.getElementById('page4').style.display = 'none';
+
+        // 显示目标页面
+        document.getElementById(pageId).style.display = 'block'; // 对于 page1 是块级，其他是 flex，但在这里可以正常工作
+        if(pageId === 'page2') {
+            document.getElementById(pageId).style.display = 'flex';
+        }
+        if(pageId === 'page4') {
+            document.getElementById(pageId).style.display = 'flex';
+        }
+    }
+</script>
+
+</body>
+</html>
